@@ -3,6 +3,9 @@ const exphbs = require('express-handlebars')
 const methodOverride = require('method-override')
 const bcrypt = require('bcryptjs')
 const PORT = process.env.PORT || 3000
+const db = require('./models')
+const Todo = db.Todo
+const User = db.User
 
 
 //使用套件後產生的
@@ -36,7 +39,9 @@ app.get('/users/register', (req, res) => {
 })
 
 app.post('/users/register', (req, res) => {
-  res.send('register')
+  const { name, email, password, confirmPassword } = req.body
+  User.create({ name, email, password })
+    .then(user => res.redirect('/'))
 })
 
 app.get('/users/logout', (req, res) => {
