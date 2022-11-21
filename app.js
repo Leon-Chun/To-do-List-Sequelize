@@ -22,7 +22,12 @@ app.use(methodOverride('_method'))
 
 //router setting
 app.get('/', (req, res) => {
-  res.send('This is my test page for initialization(初始化， 成功) ')
+  return Todo.findAll({
+    raw: true,
+    nest: true
+  })
+    .then((todos) => { return res.render('index', { todos: todos }) })
+    .catch((error) => { return res.status(422).json(error) })
 })
 
 
