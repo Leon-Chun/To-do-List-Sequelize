@@ -2,7 +2,14 @@ const express = require('express')
 const exphbs = require('express-handlebars')
 const methodOverride = require('method-override')
 const bcrypt = require('bcryptjs')
+const session = require('express-session')
+const usePassport = require('./config/passport')
+//是載入一包 Passport 設定檔
+
 const PORT = process.env.PORT || 3000
+const passport = require('passport')
+//是把 Passport 套件本身載入進來，給路由用
+
 const db = require('./models')
 const Todo = db.Todo
 const User = db.User
@@ -17,8 +24,13 @@ app.set('view engine', 'hbs')
 
 //user body get 
 app.use(express.urlencoded({ extended: true }))
-
 app.use(methodOverride('_method'))
+app.use(session({
+  secret: 'ThisIsMySecret',
+  resave: false,
+  saveUninitialized: true
+}))
+usePassport(app)
 
 //router setting
 app.get('/', (req, res) => {
@@ -41,9 +53,10 @@ app.get('/users/login', (req, res) => {
   res.render('login')
 })
 
-app.post('/users/login', (req, res) => {
-  res.send('login')
-})
+app.post('/users/login', passport.authenticate('local', {
+  successRedirect: '/',
+  failureRedirect: '/users/login'
+}))
 
 app.get('/users/register', (req, res) => {
   res.render('register')
